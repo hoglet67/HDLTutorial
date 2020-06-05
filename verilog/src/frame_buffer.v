@@ -186,7 +186,7 @@ module frame_buffer
    end
 
    // Tristate buffer
-   assign data = (!cs_n && !oe_n) ? dout : {DISP_RAM_DSIZE{1'bz}};
+   assign data = (!cs_n && !oe_n && we_n) ? dout : {DISP_RAM_DSIZE{1'bz}};
 
    // ================================================================
    // Main Pixel Pipeline
