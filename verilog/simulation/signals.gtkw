@@ -1,0 +1,72 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Fri Jun  5 15:02:39 2020
+[*]
+[dumpfile] "/disk1/home/dmb/atom/HDLTutorial/verilog/simulation/dump.vcd"
+[dumpfile_mtime] "Fri Jun  5 15:02:02 2020"
+[dumpfile_size] 4333390
+[savefile] "/disk1/home/dmb/atom/HDLTutorial/verilog/simulation/signals.gtkw"
+[timestart] 56989000
+[size] 1853 1145
+[pos] -1 -1
+*-18.000000 57790000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] frame_buffer_tb.
+[sst_width] 223
+[signals_width] 182
+[sst_expanded] 1
+[sst_vpaned_height] 343
+@28
+frame_buffer_tb.DUT.clock
+frame_buffer_tb.DUT.cs_n
+frame_buffer_tb.DUT.oe_n
+frame_buffer_tb.DUT.we_n
+frame_buffer_tb.DUT.wr0
+frame_buffer_tb.DUT.wr1
+frame_buffer_tb.DUT.wr2
+@22
+frame_buffer_tb.DUT.address[10:0]
+frame_buffer_tb.DUT.address0[10:0]
+frame_buffer_tb.DUT.address1[10:0]
+frame_buffer_tb.DUT.address2[10:0]
+frame_buffer_tb.DUT.data[7:0]
+frame_buffer_tb.DUT.din0[7:0]
+frame_buffer_tb.DUT.din1[7:0]
+frame_buffer_tb.DUT.din2[7:0]
+frame_buffer_tb.DUT.dout[7:0]
+@28
+frame_buffer_tb.DUT.pix_clken
+@22
+frame_buffer_tb.DUT.h_counter[9:0]
+frame_buffer_tb.DUT.v_counter[9:0]
+@28
+frame_buffer_tb.DUT.char_col[2:0]
+@22
+frame_buffer_tb.DUT.char_row[3:0]
+frame_buffer_tb.DUT.disp_addr_col[6:0]
+frame_buffer_tb.DUT.disp_addr_row[10:0]
+frame_buffer_tb.DUT.disp_addr[10:0]
+frame_buffer_tb.DUT.char[7:0]
+frame_buffer_tb.DUT.char_data[7:0]
+frame_buffer_tb.DUT.shift_reg[7:0]
+@28
+frame_buffer_tb.DUT.r
+frame_buffer_tb.DUT.g
+frame_buffer_tb.DUT.b
+@22
+frame_buffer_tb.DUT.active_delay[3:0]
+@28
+frame_buffer_tb.DUT.active
+@23
+frame_buffer_tb.DUT.blank_delay[3:0]
+@28
+frame_buffer_tb.DUT.blank
+@22
+frame_buffer_tb.DUT.hsync_delay[4:0]
+@28
+frame_buffer_tb.DUT.hsync
+@22
+frame_buffer_tb.DUT.vsync_delay[4:0]
+@28
+frame_buffer_tb.DUT.vsync
+[pattern_trace] 1
+[pattern_trace] 0
