@@ -1,0 +1,36 @@
+
+NET "clock" TNM_NET = clk_period_grp_50;
+TIMESPEC TS_clk_period_50 = PERIOD "clk_period_grp_50" 20.00 HIGH;
+
+NET "clock"        LOC = "T9"  | IOSTANDARD = LVCMOS33 ; # 50.000 MHz Oscillator
+
+NET "cs_n"         LOC = "E6"  | IOSTANDARD = LVCMOS33 ; #  A2 pin  4 (PA-IO1)
+NET "oe_n"         LOC = "D5"  | IOSTANDARD = LVCMOS33 ; #  A2 pin  5 (PA-IO2)
+NET "we_n"         LOC = "C5"  | IOSTANDARD = LVCMOS33 ; #  A2 pin  6 (PA-IO3)
+
+NET "address<0>"   LOC = "D6"  | IOSTANDARD = LVCMOS33 ; #  A2 pin  7 (PA-IO4)
+NET "address<1>"   LOC = "C6"  | IOSTANDARD = LVCMOS33 ; #  A2 pin  8 (PA-IO5)
+NET "address<2>"   LOC = "E7"  | IOSTANDARD = LVCMOS33 ; #  A2 pin  9 (PA-IO6)
+NET "address<3>"   LOC = "C7"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 10 (PA-IO7)
+NET "address<4>"   LOC = "D7"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 11 (PA-IO8)
+NET "address<5>"   LOC = "C8"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 12 (PA-IO9)
+NET "address<6>"   LOC = "D8"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 13 (PA-IO10)
+NET "address<7>"   LOC = "C9"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 14 (PA-IO11)
+NET "address<8>"   LOC = "D10" | IOSTANDARD = LVCMOS33 ; #  A2 pin 15 (PA-IO12)
+NET "address<9>"   LOC = "A3"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 16 (PA-IO13)
+NET "address<10>"  LOC = "B4"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 17 (PA-IO14)
+
+NET "data<0>"      LOC = "B7"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 22 (PA-DB0)
+NET "data<1>"      LOC = "A7"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 23 (PA-DB1)
+NET "data<2>"      LOC = "B8"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 24 (PA-DB2)
+NET "data<3>"      LOC = "A8"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 25 (PA-DB3)
+NET "data<4>"      LOC = "A9"  | IOSTANDARD = LVCMOS33 ; #  A2 pin 26 (PA-DB4)
+NET "data<5>"      LOC = "B10" | IOSTANDARD = LVCMOS33 ; #  A2 pin 27 (PA-DB5)
+NET "data<6>"      LOC = "A10" | IOSTANDARD = LVCMOS33 ; #  A2 pin 28 (PA-DB6)
+NET "data<7>"      LOC = "B11" | IOSTANDARD = LVCMOS33 ; #  A2 pin 29 (PA-DB7)
+
+NET "r"            LOC = "R12" | IOSTANDARD = LVCMOS33 ; # VGA Red
+NET "g"            LOC = "T12" | IOSTANDARD = LVCMOS33 ; # VGA Green
+NET "b"            LOC = "R11" | IOSTANDARD = LVCMOS33 ; # VGA Blue
+NET "hsync"        LOC = "R9"  | IOSTANDARD = LVCMOS33 ; # VGA HSync
+NET "vsync"        LOC = "T10" | IOSTANDARD = LVCMOS33 ; # VGA VSync
