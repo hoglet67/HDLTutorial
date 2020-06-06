@@ -156,7 +156,7 @@ module frame_buffer
 
    initial begin
       // Initialize characater ROM
-      $readmemb("../src/char_rom.bin", char_rom);
+      $readmemh("../src/char_rom.hex", char_rom);
 
       // Initialize display RAM
       $readmemh("../src/disp_ram.hex", disp_ram);
