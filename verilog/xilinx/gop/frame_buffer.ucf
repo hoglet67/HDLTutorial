@@ -21,9 +21,9 @@ NET "data<4>"      LOC = "P54" | IOSTANDARD = LVCMOS33 ; # pin14
 NET "data<5>"      LOC = "P55" | IOSTANDARD = LVCMOS33 ; # pin15
 NET "data<6>"      LOC = "P62" | IOSTANDARD = LVCMOS33 ; # pin16
 NET "data<7>"      LOC = "P60" | IOSTANDARD = LVCMOS33 ; # pin17
-NET "oe_n"         LOC = "P61" | IOSTANDARD = LVCMOS33 ; # pin18
+NET "address<11>"  LOC = "P61" | IOSTANDARD = LVCMOS33 ; # pin18
 NET "address<10>"  LOC = "P59" | IOSTANDARD = LVCMOS33 ; # pin19
-NET "cs_n"         LOC = "P85" | IOSTANDARD = LVCMOS33 ; # pin20
+NET "cs_ram_n"     LOC = "P85" | IOSTANDARD = LVCMOS33 ; # pin20
 NET "we_n"         LOC = "P87" | IOSTANDARD = LVCMOS33 ; # pin21
 NET "address<9>"   LOC = "P86" | IOSTANDARD = LVCMOS33 ; # pin22
 NET "address<8>"   LOC = "P88" | IOSTANDARD = LVCMOS33 ; # pin23
@@ -33,6 +33,7 @@ NET "hsync"        LOC = "P32" | IOSTANDARD = LVCMOS33 ; # connector pin E3
 NET "r"            LOC = "P34" | IOSTANDARD = LVCMOS33 ; # connector pin E4
 NET "g"            LOC = "P35" | IOSTANDARD = LVCMOS33 ; # connector pin E5
 NET "b"            LOC = "P36" | IOSTANDARD = LVCMOS33 ; # connector pin E6
+NET "cs_rom_n"     LOC = "P37" | IOSTANDARD = LVCMOS33 ; # connector pin E7
 
 #NET "ram_addr<0>"   LOC = "P40" | IOSTANDARD = LVCMOS33 ;
 #NET "ram_addr<1>"   LOC = "P63" | IOSTANDARD = LVCMOS33 ;

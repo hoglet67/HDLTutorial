@@ -3,8 +3,8 @@ module frame_buffer
       clock,
       address,
       data,
-      cs_n,
-      oe_n,
+      cs_ram_n,
+      cs_rom_n,
       we_n,
       r,
       g,
@@ -33,7 +33,7 @@ module frame_buffer
 
    // Bus Interface
    parameter BUS_DSIZE       =      8;
-   parameter BUS_ASIZE       =     11;
+   parameter BUS_ASIZE       =     12;
    parameter REG_BASE        =  'h7F0;
 
    // Character Parameters
@@ -88,6 +88,10 @@ module frame_buffer
    localparam CHAR_ROM_DSIZE = CHAR_W;
    localparam CHAR_ROM_ASIZE = DISP_RAM_DSIZE + clog2(CHAR_H);
 
+   // Bus ROM Size
+   localparam BUS_ROM_DSIZE  = BUS_DSIZE;
+   localparam BUS_ROM_ASIZE  = BUS_ASIZE;
+
    // Implementation parameters
    localparam VPD            = 5; // Video Pipeline Delay
 
@@ -101,8 +105,8 @@ module frame_buffer
    // Asynchronous bus interface
    input [BUS_ASIZE-1:0]      address;
    inout [BUS_DSIZE-1:0]      data;
-   input                      cs_n;
-   input                      oe_n;
+   input                      cs_ram_n;
+   input                      cs_rom_n;
    input                      we_n;
 
    // VGA interface
@@ -142,7 +146,8 @@ module frame_buffer
    reg [BUS_DSIZE-1:0]            din0          = 0;
    reg [BUS_DSIZE-1:0]            din1          = 0;
    reg [BUS_DSIZE-1:0]            din2          = 0;
-   reg [BUS_DSIZE-1:0]            dout          = 0;
+   reg [BUS_DSIZE-1:0]            dout_ram      = 0;
+   reg [BUS_DSIZE-1:0]            dout_rom      = 0;
    reg [clog2(       DISP_W)-1:0] cursor_col    = 0;
    reg [clog2(       DISP_H)-1:0] cursor_row    = 0;
    reg                            cursor_en     = 0;
@@ -153,13 +158,17 @@ module frame_buffer
 
    reg [DISP_RAM_DSIZE-1:0]       disp_ram[0:2**DISP_RAM_ASIZE-1];
    reg [CHAR_ROM_DSIZE-1:0]       char_rom[0:2**CHAR_ROM_ASIZE-1];
+   reg [ BUS_ROM_DSIZE-1:0]        bus_rom[0:2** BUS_ROM_ASIZE-1];
 
    initial begin
-      // Initialize characater ROM
+      // Initialize character ROM
       $readmemh("../src/char_rom.hex", char_rom);
 
       // Initialize display RAM
       $readmemh("../src/disp_ram.hex", disp_ram);
+
+      // Initialize bus ROM
+      $readmemh("../src/atommc3e_rom.hex", bus_rom);
    end
 
    // ================================================================
@@ -170,7 +179,7 @@ module frame_buffer
    always @(posedge clock) begin
 
       // Synchronise the write strobe to the FPGA clock
-      wr0 <= (!cs_n && !we_n);
+      wr0 <= (!cs_ram_n && !we_n);
       wr1 <= wr0;
       wr2 <= wr1;
 
@@ -187,27 +196,31 @@ module frame_buffer
       if (address2 == REG_BASE + 0) begin
          if (wr2 && !wr1)
            cursor_en <= din2[6];
-         dout <= {1'b0, cursor_en, 6'b0};
+         dout_ram <= {1'b0, cursor_en, 6'b0};
       end else if (address2 == REG_BASE + 1) begin
          if (wr2 && !wr1)
            cursor_col <= din2;
-         dout <= cursor_col;
+         dout_ram <= cursor_col;
       end else if (address2 == REG_BASE + 2) begin
          if (wr2 && !wr1)
            cursor_row <= din2;
-         dout <= cursor_row;
+         dout_ram <= cursor_row;
       end else begin
          // Display RAM Write (at the end of the write strobe)
          if (wr2 && !wr1)
            disp_ram[address2] <= din2;
          // Display RAM Read
-         dout <= disp_ram[address2];
-      end
+         dout_ram <= disp_ram[address2];
+      end // else: !if(address2 == REG_BASE + 2)
+
+      dout_rom <= bus_rom[address2];
 
    end
 
    // Tristate buffer
-   assign data = (!cs_n && !oe_n && we_n) ? dout : {BUS_DSIZE{1'bz}};
+   assign data = (!cs_ram_n && we_n) ? dout_ram :
+                 (!cs_rom_n && we_n) ? dout_rom :
+                 {BUS_DSIZE{1'bz}};
 
    // ================================================================
    // Main Pixel Pipeline
