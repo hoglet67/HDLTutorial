@@ -31,6 +31,11 @@ module frame_buffer
    // Parameters
    // ================================================================
 
+   // Bus Interface
+   parameter BUS_DSIZE       =      8;
+   parameter BUS_ASIZE       =     11;
+   parameter REG_BASE        =  'h7F0;
+
    // Character Parameters
    parameter CHAR_W          =      8; // Width of character in pixels
    parameter CHAR_H          =     16; // Height of character in pixels
@@ -76,8 +81,8 @@ module frame_buffer
    localparam V_END          = V_START + CHAR_H * DISP_H;
 
    // Display RAM Size
-   parameter DISP_RAM_DSIZE  = clog2(CHAR_SET_SIZE);
-   parameter DISP_RAM_ASIZE  = clog2(DISP_H*DISP_W);
+   localparam DISP_RAM_DSIZE  = clog2(CHAR_SET_SIZE);
+   localparam DISP_RAM_ASIZE  = clog2(DISP_H*DISP_W);
 
    // Charater ROM Size
    localparam CHAR_ROM_DSIZE = CHAR_W;
@@ -94,8 +99,8 @@ module frame_buffer
    input                      clock;
 
    // Asynchronous bus interface
-   input [DISP_RAM_ASIZE-1:0] address;
-   inout [DISP_RAM_DSIZE-1:0] data;
+   input [BUS_ASIZE-1:0]      address;
+   inout [BUS_DSIZE-1:0]      data;
    input                      cs_n;
    input                      oe_n;
    input                      we_n;
@@ -117,7 +122,7 @@ module frame_buffer
    reg [clog2(       CHAR_W)-1:0] char_col      = 0;
    reg [clog2(       CHAR_H)-1:0] char_row      = 0;
    reg [clog2(       DISP_W)-1:0] disp_addr_col = 0;
-   reg [clog2(DISP_H*DISP_W)-1:0] disp_addr_row = 0;
+   reg [clog2(       DISP_H)-1:0] disp_addr_row = 0;
    reg [clog2(DISP_H*DISP_W)-1:0] disp_addr     = 0;
    reg [DISP_RAM_DSIZE-1:0]       char          = 0;
    reg [CHAR_W-1:0]               char_data     = 0;
@@ -131,13 +136,16 @@ module frame_buffer
    reg                            wr0           = 0;
    reg                            wr1           = 0;
    reg                            wr2           = 0;
-   reg [DISP_RAM_ASIZE-1:0]       address0      = 0;
-   reg [DISP_RAM_ASIZE-1:0]       address1      = 0;
-   reg [DISP_RAM_ASIZE-1:0]       address2      = 0;
-   reg [DISP_RAM_DSIZE-1:0]       din0          = 0;
-   reg [DISP_RAM_DSIZE-1:0]       din1          = 0;
-   reg [DISP_RAM_DSIZE-1:0]       din2          = 0;
-   reg [DISP_RAM_DSIZE-1:0]       dout          = 0;
+   reg [BUS_ASIZE-1:0]            address0      = 0;
+   reg [BUS_ASIZE-1:0]            address1      = 0;
+   reg [BUS_ASIZE-1:0]            address2      = 0;
+   reg [BUS_DSIZE-1:0]            din0          = 0;
+   reg [BUS_DSIZE-1:0]            din1          = 0;
+   reg [BUS_DSIZE-1:0]            din2          = 0;
+   reg [BUS_DSIZE-1:0]            dout          = 0;
+   reg [clog2(       DISP_W)-1:0] cursor_col    = 0;
+   reg [clog2(       DISP_H)-1:0] cursor_row    = 0;
+   reg                            cursor_en     = 0;
 
    // ================================================================
    // Internal Block RAM
@@ -176,17 +184,30 @@ module frame_buffer
       din1 <= din0;
       din2 <= din1;
 
-      // Display RAM Write (at the end of the write strobe)
-      if (wr2 && !wr1)
-        disp_ram[address2] <= din2;
-
-      // Display RAM Read
-      dout <= disp_ram[address2];
+      if (address2 == REG_BASE + 0) begin
+         if (wr2 && !wr1)
+           cursor_en <= din2[6];
+         dout <= {1'b0, cursor_en, 6'b0};
+      end else if (address2 == REG_BASE + 1) begin
+         if (wr2 && !wr1)
+           cursor_col <= din2;
+         dout <= cursor_col;
+      end else if (address2 == REG_BASE + 2) begin
+         if (wr2 && !wr1)
+           cursor_row <= din2;
+         dout <= cursor_row;
+      end else begin
+         // Display RAM Write (at the end of the write strobe)
+         if (wr2 && !wr1)
+           disp_ram[address2] <= din2;
+         // Display RAM Read
+         dout <= disp_ram[address2];
+      end
 
    end
 
    // Tristate buffer
-   assign data = (!cs_n && !oe_n && we_n) ? dout : {DISP_RAM_DSIZE{1'bz}};
+   assign data = (!cs_n && !oe_n && we_n) ? dout : {BUS_DSIZE{1'bz}};
 
    // ================================================================
    // Main Pixel Pipeline
@@ -252,12 +273,12 @@ module frame_buffer
            if (v_counter == V_START)
              disp_addr_row <= 0;
            else if (char_row == CHAR_H - 1)
-             disp_addr_row <= disp_addr_row + DISP_W;
+             disp_addr_row <= disp_addr_row + 1'b1;
 
          // ==================== Pipeline Stage 2 ====================
 
          // Display Address Generation
-         disp_addr <= disp_addr_row + disp_addr_col;
+         disp_addr <= disp_addr_row * DISP_W + disp_addr_col;
 
          // ==================== Pipeline Stage 3 ====================
 
@@ -273,7 +294,10 @@ module frame_buffer
 
          // Video Shifter
          if (char_col == 3) // delay loading to compensate pipelining
-           shift_reg <= char_data;
+           if (cursor_en && disp_addr_col == cursor_col && disp_addr_row == cursor_row && char_row >= CHAR_H - 2)
+             shift_reg <= {CHAR_W{1'b1}};
+           else
+             shift_reg <= char_data;
          else
            shift_reg <= { shift_reg[CHAR_W-2:0], 1'b0 };
 
