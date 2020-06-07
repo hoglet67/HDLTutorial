@@ -34,7 +34,7 @@ module frame_buffer
    // Bus Interface
    parameter BUS_DSIZE       =      8;
    parameter BUS_ASIZE       =     12;
-   parameter REG_BASE        =  'h7F0;
+   parameter REG_BASE        =  'hFF0;
 
    // Character Parameters
    parameter CHAR_W          =      8; // Width of character in pixels
@@ -84,9 +84,13 @@ module frame_buffer
    localparam DISP_RAM_DSIZE  = clog2(CHAR_SET_SIZE);
    localparam DISP_RAM_ASIZE  = clog2(DISP_H*DISP_W);
 
+   // Display ROM Size
+   localparam DISP_ROM_DSIZE  = BUS_DSIZE;
+   localparam DISP_ROM_ASIZE  = BUS_ASIZE - 1;
+
    // Charater ROM Size
    localparam CHAR_ROM_DSIZE = CHAR_W;
-   localparam CHAR_ROM_ASIZE = DISP_RAM_DSIZE + clog2(CHAR_H);
+   localparam CHAR_ROM_ASIZE = clog2(CHAR_SET_SIZE) + clog2(CHAR_H);
 
    // Bus ROM Size
    localparam BUS_ROM_DSIZE  = BUS_DSIZE;
@@ -157,6 +161,7 @@ module frame_buffer
    // ================================================================
 
    reg [DISP_RAM_DSIZE-1:0]       disp_ram[0:2**DISP_RAM_ASIZE-1];
+   reg [DISP_ROM_DSIZE-1:0]       disp_rom[0:2**DISP_ROM_ASIZE-1];
    reg [CHAR_ROM_DSIZE-1:0]       char_rom[0:2**CHAR_ROM_ASIZE-1];
    reg [ BUS_ROM_DSIZE-1:0]        bus_rom[0:2** BUS_ROM_ASIZE-1];
 
@@ -166,6 +171,9 @@ module frame_buffer
 
       // Initialize display RAM
       $readmemh("../src/disp_ram.hex", disp_ram);
+
+      // Initialize display ROM
+      $readmemh("../src/disp_rom.hex", disp_rom);
 
       // Initialize bus ROM
       $readmemh("../src/atommc3e_rom.hex", bus_rom);
@@ -205,13 +213,16 @@ module frame_buffer
          if (wr2 && !wr1)
            cursor_row <= din2;
          dout_ram <= cursor_row;
-      end else begin
+      end else if (address2[BUS_ASIZE-1]) begin
          // Display RAM Write (at the end of the write strobe)
          if (wr2 && !wr1)
-           disp_ram[address2] <= din2;
+           disp_ram[address2[DISP_RAM_ASIZE-1:0]] <= din2;
          // Display RAM Read
-         dout_ram <= disp_ram[address2];
-      end // else: !if(address2 == REG_BASE + 2)
+         dout_ram <= disp_ram[address2[DISP_RAM_ASIZE-1:0]];
+      end else begin
+         // Display ROM Read
+         dout_ram <= disp_rom[address2[DISP_ROM_ASIZE-1:0]];
+      end
 
       dout_rom <= bus_rom[address2];
 
